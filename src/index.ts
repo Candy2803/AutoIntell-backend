@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import userRoutes from './routes/user';
 
 
 dotenv.config();
@@ -41,7 +42,7 @@ app.get('/health', (_req, res) => {
 });
 
 // 404 handler
-app.use('*', (_req, res) => {
+app.use((_req, res) => {
     res.status(404).json({
         error: 'Route not found'
     });
