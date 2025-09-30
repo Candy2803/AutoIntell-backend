@@ -3,6 +3,18 @@
   "version": "1.0.0",
   "description": "",
   "main": "src/index.js",
+  "imports": {
+    "#src/*": "./src/*",
+    "#config/*": "./src/config/*",
+    "#controllers/*": "./src/controllers/*",
+    "#middleware/*": "./src/middleware/*",
+    "#models/*": "./src/models/*",
+    "#routes/*": "./src/routes/*",
+    "#services/*": "./src/services/*",
+    "#utils/*": "./src/utils/*",
+    "#validations/*": "./src/validations/*",
+    "#firebase/*": "./src/firebase/*"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node src/index.ts",
@@ -18,18 +30,25 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@types/cookie-parser": "^1.4.9",
+    "@types/morgan": "^1.9.10",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "express-rate-limit": "^8.1.0",
     "firebase": "^12.2.1",
     "firebase-admin": "^13.5.0",
-    "helmet": "^8.1.0"
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.1",
+    "winston": "^3.17.0",
+    "zod": "^4.1.11"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.3.0",
     "eslint": "^9.36.0",
     "eslint-config-prettier": "^10.1.8",
