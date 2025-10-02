@@ -23,8 +23,6 @@ export interface User {
   uid: string;
   name: string;
   email: string;
-  profileURL?: string;
-  resumeURL?: string;
 }
 
 export interface AuthResponse {
@@ -34,7 +32,10 @@ export interface AuthResponse {
 }
 
 // Set session cookie
-export async function setSessionCookie(idToken: string, res: Response): Promise<void> {
+export async function setSessionCookie(
+  idToken: string,
+  res: Response
+): Promise<void> {
   try {
     // Create session cookie
     const sessionCookie = await auth.createSessionCookie(idToken, {
@@ -52,7 +53,9 @@ export async function setSessionCookie(idToken: string, res: Response): Promise<
   }
 }
 
-export async function createUser(params: SignUpParams): Promise<AuthResponse & { uid?: string }> {
+export async function createUser(
+  params: SignUpParams
+): Promise<AuthResponse & { uid?: string }> {
   const { name, email, password } = params;
 
   try {
@@ -103,31 +106,32 @@ export async function createUser(params: SignUpParams): Promise<AuthResponse & {
 }
 
 // Firebase sign in with email and password (server-side verification)
-export async function authenticateWithEmailPassword(email: string, password: string): Promise<AuthResponse> {
+export async function authenticateWithEmailPassword(
+  email: string,
+  password: string
+): Promise<AuthResponse> {
   try {
     // Note: Firebase Admin SDK doesn't support password verification directly
     // This would typically be done on the client-side, then verified with ID token
     // For now, we'll get user by email and assume password is verified client-side
     const userRecord = await auth.getUserByEmail(email);
-    
+
     // Get user data from Firestore
     const userDoc = await db.collection('users').doc(userRecord.uid).get();
-    
+
     if (!userDoc.exists) {
       return {
         success: false,
         message: 'User profile not found.',
       };
     }
-    
+
     const userData = userDoc.data();
     const user: User = {
       id: userRecord.uid,
       uid: userRecord.uid,
       name: userData?.name || userRecord.displayName || '',
       email: userRecord.email || email,
-      profileURL: userData?.profileURL,
-      resumeURL: userData?.resumeURL,
     };
 
     return {
@@ -137,14 +141,14 @@ export async function authenticateWithEmailPassword(email: string, password: str
     };
   } catch (error: any) {
     console.error('Authentication error:', error);
-    
+
     if (error.code === 'auth/user-not-found') {
       return {
         success: false,
         message: 'User with this email does not exist',
       };
     }
-    
+
     return {
       success: false,
       message: 'Invalid email or password',
@@ -152,7 +156,10 @@ export async function authenticateWithEmailPassword(email: string, password: str
   }
 }
 
-export async function signIn(params: SignInParams, res: Response): Promise<AuthResponse> {
+export async function signIn(
+  params: SignInParams,
+  res: Response
+): Promise<AuthResponse> {
   const { email, idToken } = params;
 
   try {
@@ -165,19 +172,21 @@ export async function signIn(params: SignInParams, res: Response): Promise<AuthR
     }
 
     await setSessionCookie(idToken, res);
-    
+
     // Get user data from database
     const userDoc = await db.collection('users').doc(userRecord.uid).get();
     const userData = userDoc.data();
-    
+
     return {
       success: true,
       message: 'Successfully signed in.',
-      user: userData ? {
-        id: userDoc.id,
-        uid: userRecord.uid,
-        ...userData,
-      } as User : undefined,
+      user: userData
+        ? ({
+            id: userDoc.id,
+            uid: userRecord.uid,
+            ...userData,
+          } as User)
+        : undefined,
     };
   } catch (error: any) {
     console.error('Sign in error:', error);
@@ -227,7 +236,11 @@ export async function isAuthenticated(req: Request): Promise<boolean> {
 }
 
 // Middleware function to authenticate requests (Firebase session cookie)
-export async function authenticateSession(req: Request, res: Response, next: any): Promise<void> {
+export async function authenticateSession(
+  req: Request,
+  res: Response,
+  next: any
+): Promise<void> {
   try {
     const user = await getCurrentUser(req);
     if (!user) {

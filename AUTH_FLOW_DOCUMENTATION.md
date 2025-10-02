@@ -7,6 +7,7 @@ The AutoIntell backend uses a hybrid authentication system combining **Firebase 
 ## Architecture
 
 ### Technology Stack
+
 - **Firebase Admin SDK** - User creation and management
 - **Firestore** - User data storage
 - **JSON Web Tokens (JWT)** - Session tokens
@@ -15,6 +16,7 @@ The AutoIntell backend uses a hybrid authentication system combining **Firebase 
 - **TypeScript** - Type safety
 
 ### Authentication Types Supported
+
 1. **JWT-based authentication** (Primary) - For API access
 2. **Firebase Session Cookies** - For web browser sessions
 3. **Mixed approach** - JWT tokens stored in HTTP-only cookies
@@ -26,6 +28,7 @@ The AutoIntell backend uses a hybrid authentication system combining **Firebase 
 **Endpoint:** `POST /api/auth/sign-up`
 
 **Request Body:**
+
 ```json
 {
   "name": "John Doe",
@@ -36,6 +39,7 @@ The AutoIntell backend uses a hybrid authentication system combining **Firebase 
 ```
 
 **Process Flow:**
+
 1. **Input Validation** - Zod schema validates request data
    - Name: 1-255 characters, trimmed
    - Email: Valid email format, lowercase, trimmed
@@ -61,6 +65,7 @@ The AutoIntell backend uses a hybrid authentication system combining **Firebase 
    - SameSite: 'strict' for security
 
 **Success Response (201):**
+
 ```json
 {
   "message": "Account created successfully.",
@@ -74,6 +79,7 @@ The AutoIntell backend uses a hybrid authentication system combining **Firebase 
 ```
 
 **Error Responses:**
+
 - `400` - Validation failed
 - `409` - Email already exists
 - `500` - Internal server error
@@ -83,6 +89,7 @@ The AutoIntell backend uses a hybrid authentication system combining **Firebase 
 **Endpoint:** `POST /api/auth/sign-in`
 
 **Request Body:**
+
 ```json
 {
   "email": "john@example.com",
@@ -91,6 +98,7 @@ The AutoIntell backend uses a hybrid authentication system combining **Firebase 
 ```
 
 **Process Flow:**
+
 1. **Input Validation** - Email and password validation
 2. **Firebase User Lookup** - Gets user by email from Firebase Auth
 3. **Firestore Data Retrieval** - Fetches user profile from Firestore
@@ -98,12 +106,13 @@ The AutoIntell backend uses a hybrid authentication system combining **Firebase 
 5. **Cookie Setting** - Sets secure HTTP-only cookie
 
 **Success Response (200):**
+
 ```json
 {
   "message": "Authentication successful.",
   "user": {
     "id": "firebase-user-uid",
-    "uid": "firebase-user-uid", 
+    "uid": "firebase-user-uid",
     "name": "John Doe",
     "email": "john@example.com"
   }
@@ -111,6 +120,7 @@ The AutoIntell backend uses a hybrid authentication system combining **Firebase 
 ```
 
 **Error Responses:**
+
 - `400` - Validation failed
 - `401` - Invalid email or password
 - `401` - User with this email does not exist
@@ -123,11 +133,13 @@ The AutoIntell backend uses a hybrid authentication system combining **Firebase 
 **Authentication:** Required (JWT token in cookie or Authorization header)
 
 **Process Flow:**
+
 1. **Token Extraction** - From cookie or Authorization header
 2. **JWT Verification** - Validates token signature and expiration
 3. **User Data Return** - Returns decoded token payload
 
 **Success Response (200):**
+
 ```json
 {
   "success": true,
@@ -139,6 +151,7 @@ The AutoIntell backend uses a hybrid authentication system combining **Firebase 
 ```
 
 **Error Responses:**
+
 - `401` - Authentication required
 - `401` - Invalid or expired token
 
@@ -147,11 +160,13 @@ The AutoIntell backend uses a hybrid authentication system combining **Firebase 
 **Endpoint:** `POST /api/auth/sign-out`
 
 **Process Flow:**
+
 1. **JWT Cookie Clearing** - Removes "token" cookie
 2. **Firebase Session Clearing** - Removes "session" cookie if present
 3. **Success Response** - Confirms logout
 
 **Success Response (200):**
+
 ```json
 {
   "message": "User signed out successfully"
@@ -161,6 +176,7 @@ The AutoIntell backend uses a hybrid authentication system combining **Firebase 
 ## Security Features
 
 ### Token Security
+
 - **JWT Secret** - Stored in environment variable `JWT_SECRET`
 - **Token Expiration** - 1 day default (configurable)
 - **HTTP-Only Cookies** - Prevents XSS attacks
@@ -168,12 +184,14 @@ The AutoIntell backend uses a hybrid authentication system combining **Firebase 
 - **SameSite Policy** - Prevents CSRF attacks
 
 ### Firebase Integration
+
 - **Admin SDK** - Server-side user management
 - **Firestore Rules** - Database-level security
 - **Email Verification** - Can be enabled
 - **Custom Claims** - Role-based permissions
 
 ### Input Validation
+
 - **Zod Schemas** - Runtime type checking
 - **Sanitization** - Email lowercase, string trimming
 - **Length Limits** - Prevent overflow attacks
@@ -182,32 +200,35 @@ The AutoIntell backend uses a hybrid authentication system combining **Firebase 
 ## Middleware
 
 ### JWT Authentication Middleware
+
 ```typescript
 // Usage: app.get('/protected', authenticateJWT, handler)
 export const authenticateJWT = async (req, res, next) => {
   // Extracts JWT from cookie or Authorization header
   // Verifies token and adds user to req.user
   // Returns 401 if invalid/missing
-}
+};
 ```
 
-### Firebase Session Middleware  
+### Firebase Session Middleware
+
 ```typescript
 // Usage: app.get('/protected', authenticateFirebaseSession, handler)
 export const authenticateFirebaseSession = async (req, res, next) => {
   // Verifies Firebase session cookie
   // Fetches user data from Firestore
   // Returns 401 if invalid/missing
-}
+};
 ```
 
 ### Optional Authentication
+
 ```typescript
-// Usage: app.get('/public', optionalAuth, handler)  
+// Usage: app.get('/public', optionalAuth, handler)
 export const optionalAuth = async (req, res, next) => {
   // Attempts to authenticate but doesn't fail
   // Useful for endpoints that work for both auth/unauth users
-}
+};
 ```
 
 ## File Structure
@@ -216,7 +237,7 @@ export const optionalAuth = async (req, res, next) => {
 src/
 ├── controllers/
 │   └── auth.controller.ts     # Request handlers
-├── services/  
+├── services/
 │   └── auth.service.ts        # Business logic
 ├── middleware/
 │   └── auth.middleware.ts     # Authentication middleware
@@ -242,7 +263,7 @@ FIREBASE_PROJECT_ID=your-project-id
 FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com
 FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 
-# JWT Configuration  
+# JWT Configuration
 JWT_SECRET=your-super-secure-jwt-secret-key
 
 # Server Configuration
@@ -253,6 +274,7 @@ PORT=3000
 ## Error Handling
 
 ### Validation Errors (400)
+
 ```json
 {
   "error": "Validation failed.",
@@ -261,6 +283,7 @@ PORT=3000
 ```
 
 ### Authentication Errors (401)
+
 ```json
 {
   "success": false,
@@ -269,6 +292,7 @@ PORT=3000
 ```
 
 ### Server Errors (500)
+
 ```json
 {
   "error": "Internal server error"
@@ -278,17 +302,19 @@ PORT=3000
 ## Testing the Auth Flow
 
 ### 1. Sign Up New User
+
 ```bash
 curl -X POST http://localhost:3000/api/auth/sign-up \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Test User",
-    "email": "test@example.com", 
+    "email": "test@example.com",
     "password": "password123"
   }'
 ```
 
 ### 2. Sign In User
+
 ```bash
 curl -X POST http://localhost:3000/api/auth/sign-in \
   -H "Content-Type: application/json" \
@@ -299,12 +325,14 @@ curl -X POST http://localhost:3000/api/auth/sign-in \
 ```
 
 ### 3. Access Protected Route
+
 ```bash
 curl -X GET http://localhost:3000/api/auth/me \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 ### 4. Sign Out User
+
 ```bash
 curl -X POST http://localhost:3000/api/auth/sign-out
 ```
@@ -312,7 +340,7 @@ curl -X POST http://localhost:3000/api/auth/sign-out
 ## Best Practices Implemented
 
 1. **Separation of Concerns** - Controllers, services, middleware separated
-2. **Type Safety** - Full TypeScript implementation  
+2. **Type Safety** - Full TypeScript implementation
 3. **Input Validation** - Zod schemas for runtime validation
 4. **Error Handling** - Consistent error responses
 5. **Security Headers** - Helmet middleware enabled
@@ -324,22 +352,23 @@ curl -X POST http://localhost:3000/api/auth/sign-out
 ## Database Schema
 
 ### Users Collection (Firestore)
+
 ```typescript
 interface UserDocument {
-  uid: string;           // Firebase Auth UID
-  name: string;          // Display name
-  email: string;         // Email address
-  createdAt: string;     // ISO timestamp
-  profileURL?: string;   // Optional profile image
-  resumeURL?: string;    // Optional resume/CV
-  role?: string;         // User role (future feature)
+  uid: string; // Firebase Auth UID
+  name: string; // Display name
+  email: string; // Email address
+  createdAt: string; // ISO timestamp
+  profileURL?: string; // Optional profile image
+  resumeURL?: string; // Optional resume/CV
+  role?: string; // User role (future feature)
 }
 ```
 
 ## Future Enhancements
 
 1. **Email Verification** - Firebase email verification flow
-2. **Password Reset** - Firebase password reset integration  
+2. **Password Reset** - Firebase password reset integration
 3. **OAuth Providers** - Google, GitHub, etc.
 4. **Role-based Access Control** - Admin/user permissions
 5. **Session Management** - Active session tracking
@@ -359,7 +388,7 @@ interface UserDocument {
    - Verify environment variables are set
    - Check Firebase service account permissions
 
-3. **JWT Token Issues**  
+3. **JWT Token Issues**
    - Ensure JWT_SECRET is set in environment
    - Check token expiration settings
 

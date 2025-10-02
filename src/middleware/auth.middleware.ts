@@ -26,7 +26,7 @@ export const authenticateJWT = async (
   try {
     // Get token from cookie or Authorization header
     let token = cookies.get(req, 'token');
-    
+
     if (!token) {
       const authHeader = req.headers.authorization;
       if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -45,7 +45,7 @@ export const authenticateJWT = async (
     // Verify JWT token
     const decoded = jwttoken.verify(token) as any;
     req.user = decoded;
-    
+
     next();
   } catch (error) {
     logger.error('JWT Authentication error:', error);
